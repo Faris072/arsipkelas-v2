@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
-class Role extends Model
+class PhotoProfile extends Model
 {
     use HasFactory, SoftDeletes;
 
@@ -23,7 +23,7 @@ class Role extends Model
         });
     }
 
-    public function users(){
-        return $this->hasMany(User::class,'role_id','id');
+    public function user(){
+        return $this->belongsTo(User::class,'user_id','id');
     }
 }
