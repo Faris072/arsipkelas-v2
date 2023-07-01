@@ -32,8 +32,8 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class,'role_id','id');
     }
 
-    public function photoProfiles(){
-        return $this->hasMany(PhotoProfile::class,'user_id','id');
+    public function photoProfile(){
+        return $this->hasOne(PhotoProfile::class,'user_id','id');
     }
 
     public function userSchools(){
