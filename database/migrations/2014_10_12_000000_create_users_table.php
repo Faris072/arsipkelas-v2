@@ -18,9 +18,9 @@ return new class extends Migration
             $table->uuid('uuid')->unique();
             $table->foreignId('role_id')->constrained('roles')->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('name');
-            $table->string('username');
-            $table->string('email');
-            $table->string('phone');
+            $table->string('username')->unique();
+            $table->string('email')->unique();
+            $table->string('phone')->unique();
             $table->string('password');
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->uuid('uuid')->unique();
             $table->foreignId('class_room_id')->constrained('class_rooms')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('semester_id')->constrained('semester')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('semester_id')->constrained('semesters')->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('name');
             $table->boolean('is_active');
             $table->unsignedBigInteger('created_by')->nullable();
