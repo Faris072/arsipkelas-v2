@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
-class Major extends Model
+class ClassRoom extends Model
 {
     use HasFactory, SoftDeletes;
 
@@ -23,11 +23,19 @@ class Major extends Model
         });
     }
 
-    public function grade(){
-        return $this->belongsTo(Grade::class,'grade_id','id');
+    public function school(){
+        return $this->belongsTo(School::class,'school_id','id');
     }
 
-    public function classRooms(){
-        return $this->hasMany(ClassRoom::class,'major_id','id');
+    public function major(){
+        return $this->belongsTo(Major::class,'major_id','id');
+    }
+
+    public function subjects(){
+        return $this->hasMany(Subject::class,'class_room_id','id');
+    }
+
+    public function userSchoolClasses(){
+        return $this->hasMany(UserSchoolClass::class,'class_room_id','id');
     }
 }
