@@ -15,3 +15,12 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::post('user/register','App\Http\Controllers\Api\UserController@register');
+Route::post('user/login','App\Http\Controllers\Api\UserController@login');
+Route::group(['middleware' => ['auth:sanctum']], function(){
+    Route::group(['prefix' => 'user'], function(){
+        Route::get('me','App\Http\Controllers\Api\UserController@me');
+        Route::put('change-password','App\Http\Controllers\Api\UserController@changePassword');
+        Route::post('logout','App\Http\Controllers\Api\UserController@logout');
+        Route::put('reset-password/{id}','App\Http\Controllers\Api\UserController@resetPassword')->middleware('admin');
+    });
+});

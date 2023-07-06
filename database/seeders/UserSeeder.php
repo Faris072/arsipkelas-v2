@@ -17,9 +17,9 @@ class UserSeeder extends Seeder
     public function run()
     {
         $data = [
-            ['uuid' => Str::uuid(), 'role_id' => 1, 'name' => 'Developer', 'username' => 'developer', 'email' => 'farisbos.mfs@gmail.com', 'phone' => '085706389042', 'password' => 'Faris072'],
-            ['uuid' => Str::uuid(), 'role_id' => 2, 'name' => 'Administrator', 'username' => 'admin', 'email' => 'mufashadesu@gmail.com', 'phone' => '085706389043', 'password' => 'Faris072'],
-            ['uuid' => Str::uuid(), 'role_id' => 3, 'name' => 'Administrator 2', 'username' => 'admin2', 'email' => 'mufashadesu2@gmail.com', 'phone' => '085706389044', 'password' => 'Faris072'],
+            ['uuid' => Str::uuid(), 'role_id' => 1, 'name' => 'Developer', 'username' => 'developer', 'email' => 'farisbos.mfs@gmail.com', 'phone' => '085706389042', 'password' => bcrypt('Faris072')],
+            ['uuid' => Str::uuid(), 'role_id' => 2, 'name' => 'Administrator', 'username' => 'admin', 'email' => 'mufashadesu@gmail.com', 'phone' => '085706389043', 'password' => bcrypt('Faris072')],
+            ['uuid' => Str::uuid(), 'role_id' => 2, 'name' => 'Administrator 2', 'username' => 'admin2', 'email' => 'mufashadesu2@gmail.com', 'phone' => '085706389044', 'password' => bcrypt('Faris072')],
         ];
 
         foreach($data as $d){
