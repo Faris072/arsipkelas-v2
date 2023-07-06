@@ -22,5 +22,6 @@ Route::group(['middleware' => ['auth:sanctum']], function(){
         Route::put('change-password','App\Http\Controllers\Api\UserController@changePassword');
         Route::post('logout','App\Http\Controllers\Api\UserController@logout');
         Route::put('reset-password/{id}','App\Http\Controllers\Api\UserController@resetPassword')->middleware('admin');
+        Route::post('upload-photo-profile','App\Http\Controllers\Api\UserController@uploadFile');
     });
 });

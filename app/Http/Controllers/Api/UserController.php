@@ -234,7 +234,8 @@ class UserController extends Controller
                 'updated_by' => auth()->user()->id,
             ];
 
-            $store = PhotoProfile::create($data);
+            $validation = ['user_id' => $data['user_id']];
+            $store = PhotoProfile::updateOrCreate($validation,$data);
             if(!$store){
                 DB::rollback();
                 return $this->getResponse('','Profil gagal diperbarui',500);
