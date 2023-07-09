@@ -4,8 +4,6 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
-use App\Traits\UserStampsTrait;
-use App\Traits\UuidTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -15,11 +13,28 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, SoftDeletes, UuidTrait, UserStampsTrait;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
     protected $guarded = ['id','uuid'];
 
-    protected $hidden = ['uuid','password'];
+    protected $hidden = ['id','password'];
+
+    protected static function boot(){
+        parent::boot();
+
+        static::creating(function($model){
+            $model->uuid = Str::uuid();
+            $model->created_by = null;
+        });
+
+        static::saving(function($model){
+            $model->updated_by = auth()->user()->id;
+        });
+
+        static::deleting(function($model){
+            $model->deleted_by = auth()->user()->id;
+        });
+    }
 
     public function role(){
         return $this->belongsTo(Role::class,'role_id','id');

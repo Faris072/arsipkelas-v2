@@ -11,7 +11,7 @@ use App\Traits\UuidTrait;
 
 class Grade extends Model
 {
-    use HasFactory, SoftDeletes, UuidTrait, UserStampsTrait;
+    use HasFactory, SoftDeletes;
 
     protected $guarded = ['id','uuid'];
 
