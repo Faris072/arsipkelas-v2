@@ -6,10 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
+use App\Traits\UserStampsTrait;
+use App\Traits\UuidTrait;
 
 class Grade extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, UuidTrait, UserStampsTrait;
 
     protected $guarded = ['id','uuid'];
 
@@ -20,6 +22,15 @@ class Grade extends Model
 
         static::creating(function($model){
             $model->uuid = Str::uuid();
+            $model->created_by = auth()->user()->id;
+        });
+
+        static::saving(function($model){
+            $model->updated_by = auth()->user()->id;
+        });
+
+        static::deleting(function($model){
+            $model->deleted_by = auth()->user()->id;
         });
     }
 
