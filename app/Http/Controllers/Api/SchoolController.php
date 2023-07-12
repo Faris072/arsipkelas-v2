@@ -31,7 +31,7 @@ class SchoolController extends Controller
                 'name' => 'required|string',
                 'phone' => 'required',
                 'email' => 'required|email',
-                'address' => 'required'
+                'address' => 'required|string'
             ],$messages,$attributes);
 
             if($validatedData->fails()){
@@ -71,9 +71,51 @@ class SchoolController extends Controller
     public function update(Request $request, $id){
         DB::beginTransaction();
         try{
-            $attributes = [
+            $request['id'] = $id;
 
+            $attributes = [
+                'id' => 'ID sekolah',
+                'name' => 'Nama sekolah',
+                'phone' => 'Telepon sekolah',
+                'email' => 'Email sekolah',
+                'address' => 'Alamat sekolah',
             ];
+
+            $messages = [
+                'id' => ':attribute tidak valid.',
+                'required' => ':attribute tidak boleh kosong.',
+                'email' => ':attribute harus berupa email yang valid.',
+                'string' => ':attribute harus berupa string.',
+            ];
+
+
+            $validatedData = Validator::make($request->all(),[
+                'id' => 'required|uuid|exists:schools,uuid',
+                'name' => 'required|string',
+                'phone' => 'required',
+                'email' => 'required|email',
+                'address' => 'required|string',
+            ],$messages,$attributes);
+
+            if($validatedData->fails()){
+                DB::rollback();
+                return $this->getResponse(null,$validatedData->getMessageBag(),422);
+            }
+
+            $school = School::firstWhere('uuid',$id);
+            if(!$school){
+                DB::rollback();
+                return $this->getResponse(null,'Sekolah tidak ditemukan.',422);
+            }
+
+            $update = $school->update($request->only(['name','phone','email','address']));
+            if(!$update){
+                DB::rollback();
+                return $this->getResponse(null,'Sekolah gagal diupdate.',500);
+            }
+
+            DB::commit();
+            return $this->getResponse(null,'Sekolah berhasil diupdate',200);
         }
         catch(\Exception $e){
             DB::rollback();
