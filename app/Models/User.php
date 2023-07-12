@@ -28,7 +28,7 @@ class User extends Authenticatable
         });
 
         static::saving(function($model){
-            $model->updated_by = auth()->user()->id;
+            $model->updated_by = auth()->user()->id ?? null;
         });
 
         static::deleting(function($model){

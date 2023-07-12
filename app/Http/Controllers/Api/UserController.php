@@ -27,7 +27,6 @@ class UserController extends Controller
 
             $messages = [
                 'required' => ':attribute tidak boleh kosong.',
-                'uuid' => 'Id :attribute tidak valid.',
                 'email' => ':attribute tidak valid.',
                 'username.min' => ':attribute minimal 3 karakter.',
                 'password.min' => ':attribute minimal 8 karakter.',
@@ -50,7 +49,7 @@ class UserController extends Controller
             $request['role_id'] = 3;
             $request['password'] = bcrypt($request->password);
 
-            $create = User::create($request->all());
+            $create = User::create($request->only(['username','email','phone','name','password','role_id']));
             if(!$create){
                 DB::rollBack();
                 return $this->getResponse('','User gagal dibuat',500);
@@ -69,7 +68,7 @@ class UserController extends Controller
         try{
             $user = User::where('username',$request->username)->orWhere('email',$request->username)->orWhere('phone',$request->username)->first();
             if(!$user || !Hash::check($request->password, $user->password)){
-                return $this->getResponse('','Authentikasi gagal. Silahkan logiin kembali.',401);
+                return $this->getResponse(null,'Authentikasi gagal. Silahkan logiin kembali.',401);
             }
 
             $token = $user->createToken('arsipkelasv2_token')->plainTextToken;
@@ -82,7 +81,7 @@ class UserController extends Controller
             return $this->getResponse($data, 'Login berhasil.',200);
         }
         catch(\Exception $e){
-            return $this->getResponse('',$e->getMessage(),500);
+            return $this->getResponse(null,$e->getMessage(),500);
         }
     }
 
@@ -92,7 +91,7 @@ class UserController extends Controller
             return $this->getResponse($user,'Data berhasil ditampilkan',200);
         }
         catch(\Exception $e){
-            return $this->getResponse('',$e->getMessage(),500);
+            return $this->getResponse(null,$e->getMessage(),500);
         }
     }
 
@@ -117,23 +116,23 @@ class UserController extends Controller
 
             if($validatedData->fails()){
                 DB::rollback();
-                return $this->getResponse('',$validatedData->getMessageBag(),422);
+                return $this->getResponse(null,$validatedData->getMessageBag(),422);
             }
 
             if($request->password == $request->new_password){
                 DB::rollback();
-                return $this->getResponse('','Password baru tidak boleh sama dengan password lama',422);
+                return $this->getResponse(null,'Password baru tidak boleh sama dengan password lama',422);
             }
 
             if(!Hash::check($request->password, auth()->user()->password)){
                 DB::rollback();
-                return $this->getResponse('','Password salah',400);
+                return $this->getResponse(null,'Password salah',400);
             };
 
             $user = User::find(Auth()->user()->id);
             if(!$user){
                 DB::rollback();
-                return $this->getResponse('','User tidak ditemukan',404);
+                return $this->getResponse(null,'User tidak ditemukan',404);
             }
 
             $change = $user->update([
@@ -142,15 +141,15 @@ class UserController extends Controller
 
             if(!$change){
                 DB::rollback();
-                return $this->getResponse('','Reset password gagal',500);
+                return $this->getResponse(null,'Reset password gagal',500);
             }
 
             DB::commit();
-            return $this->getResponse('','Password berhasil diubah',200);
+            return $this->getResponse(null,'Password berhasil diubah',200);
         }
         catch(\Exception $e){
             DB::rollback();
-            return $this->getResponse('',$e->getMessage(),500);
+            return $this->getResponse(null,$e->getMessage(),500);
         }
     }
 
@@ -158,13 +157,13 @@ class UserController extends Controller
         try{
             $logout = auth('sanctum')->user()->tokens()->delete();
             if(!$logout){
-                return $this->getResponse('','Logout gagal',500);
+                return $this->getResponse(null,'Logout gagal',500);
             }
 
-            return $this->getResponse('','Logout berhasil',200);
+            return $this->getResponse(null,'Logout berhasil',200);
         }
         catch(\Exception $e){
-            return $this->getResponse('',$e->getMessage(),500);
+            return $this->getResponse(null,$e->getMessage(),500);
         }
     }
 
@@ -174,7 +173,7 @@ class UserController extends Controller
             $user = User::firstWhere('uuid',$id);
             if(!$user){
                 DB::rollback();
-                return $this->getResponse('','User tidak ditemukan.',404);
+                return $this->getResponse(null,'User tidak ditemukan.',404);
             }
 
             $reset = $user->update([
@@ -183,15 +182,15 @@ class UserController extends Controller
 
             if(!$reset){
                 DB::rollback();
-                return $this->getResponse('','Reset password gagal',500);
+                return $this->getResponse(null,'Reset password gagal',500);
             }
 
             DB::commit();
-            return $this->getResponse('','Reset Password Berhasil',200);
+            return $this->getResponse(null,'Reset Password Berhasil',200);
         }
         catch(\Exception $e){
             DB::rollback();
-            return $this->getResponse('',$e->getMessage(),500);
+            return $this->getResponse(null,$e->getMessage(),500);
         }
     }
 
@@ -215,7 +214,7 @@ class UserController extends Controller
 
             if($validatedData->fails()){
                 DB::rollBack();
-                return $this->getResponse('',$validatedData->getMessageBag(),422);
+                return $this->getResponse(null,$validatedData->getMessageBag(),422);
             }
 
             $path = 'profile/'.auth()->user()->id;
@@ -238,7 +237,7 @@ class UserController extends Controller
             $store = PhotoProfile::updateOrCreate($validation,$data);
             if(!$store){
                 DB::rollback();
-                return $this->getResponse('','Profil gagal diperbarui',500);
+                return $this->getResponse(null,'Profil gagal diperbarui',500);
             }
 
             $files = Storage::allFiles('profile/'.auth()->user()->id);
@@ -249,11 +248,11 @@ class UserController extends Controller
             $request->file->storeAs($path, $data['name']);
 
             DB::commit();
-            return $this->getResponse('','Profil berhasil diubah',200);
+            return $this->getResponse(null,'Profil berhasil diubah',200);
         }
         catch(\Exception $e){
             DB::rollback();
-            return $this->getResponse('',$e->getMessage(),500);
+            return $this->getResponse(null,$e->getMessage(),500);
         }
     }
 }

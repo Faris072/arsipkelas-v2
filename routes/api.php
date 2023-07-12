@@ -24,4 +24,10 @@ Route::group(['middleware' => ['auth:sanctum']], function(){
         Route::put('reset-password/{id}','App\Http\Controllers\Api\UserController@resetPassword')->middleware('admin');
         Route::post('upload-photo-profile','App\Http\Controllers\Api\UserController@uploadFile');
     });
+    Route::group(['prefix' => 'school'], function(){
+        Route::post('create','App\Http\Controllers\Api\SchoolController@create');
+        Route::group(['middleware', 'admin-school'], function(){
+            Route::post('update/{id}','App\Http\Controllers\Api\SchoolController@update');
+        });
+    });
 });

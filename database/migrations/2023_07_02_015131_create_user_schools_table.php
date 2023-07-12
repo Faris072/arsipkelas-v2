@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('school_id')->constrained('schools')->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('school_role_id')->constrained('school_roles')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->string('jabatan');
+            $table->string('jabatan')->nullable();
             $table->boolean('is_active');
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();
