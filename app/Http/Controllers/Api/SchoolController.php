@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 use App\Models\School;
+use App\Models\SchoolPhoto;
 use App\Models\UserSchool;
 
 class SchoolController extends Controller
@@ -120,6 +122,66 @@ class SchoolController extends Controller
         catch(\Exception $e){
             DB::rollback();
             return $this->getResponse('',$e->getMessage(),500);
+        }
+    }
+
+    public function uploadPhoto(Request $request, $id){
+        try{
+            $attributes = [
+                'file' => 'Foto sekolah',
+            ];
+
+            $messages = [
+                'required' => ':attribute wajib di isi.',
+                'image' => ':attribute harus berupa gambar.',
+                'max' => ':attribute maksimal 1MB.',
+                'mimes' => ':attribute harus berupa .jpeg, .jpg, dan .png',
+            ];
+
+            $validatedData = Validator::make($request->all(),[
+                'file' => 'required|image|max:1024|mimes:jpg,jpeg,png'
+            ],$messages,$attributes);
+
+            if($validatedData->fails()){
+                return $this->getResponse(null,$validatedData->getMessageBag(),422);
+            }
+
+            $school = School::firstWhere('uuid',$id);
+
+            $path = 'school-photos/'.$school->id;
+            $name = time().random_int(1,100).$request->file->getClientOriginalName();
+
+            $data = [
+                'school_id' => $school->id,
+                'name' => $name,
+                'original_name' => $request->file->getClientOriginalName(),
+                'path' => $path,
+                'extension' => $request->file->getClientOriginalExtension(),
+                'size' => $request->file->getSize(),
+                'mime_type' => $request->file->getMimeType(),
+                'is_image' => substr($request->file->getMimeType(), 0, 5) == 'image' ? true : false,
+            ];
+
+            $validation = ['school_id' => $data['school_id']];
+            $upload = SchoolPhoto::updateOrCreate($validation, $data);
+            if(!$upload){
+                DB::rollback();
+                return $this->getResponse(null,'Upload file gagal!',500);
+            }
+
+            $files = Storage::allFiles('school-photos/',$school->id);
+            foreach($files as $f){
+                Storage::delete($f);
+            }
+
+            $request->file->storeAs($path, $data['name']);
+
+            DB::commit();
+            return $this->getResponse(null,'Foto sekolah berhasil disimpan',200);
+        }
+        catch(\Exception $e){
+            DB::rollback();
+            return $this->getResponse(null,$e->getMessage(),500);
         }
     }
 }

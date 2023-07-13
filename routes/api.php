@@ -28,6 +28,7 @@ Route::group(['middleware' => ['auth:sanctum']], function(){
         Route::post('create','App\Http\Controllers\Api\SchoolController@create');
         Route::group(['middleware', 'admin-school'], function(){
             Route::put('update/{id}','App\Http\Controllers\Api\SchoolController@update');
+            Route::post('upload-photo/{id}','App\Http\Controllers\Api\SchoolController@uploadPhoto');
         });
     });
 });

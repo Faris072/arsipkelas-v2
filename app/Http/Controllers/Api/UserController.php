@@ -229,8 +229,6 @@ class UserController extends Controller
                 'size' => $request->file->getSize(),
                 'mime_type' => $request->file->getMimeType(),
                 'is_image' => substr($request->file->getMimeType(), 0, 5) == 'image' ? true : false,
-                'created_by' => auth()->user()->id,
-                'updated_by' => auth()->user()->id,
             ];
 
             $validation = ['user_id' => $data['user_id']];
