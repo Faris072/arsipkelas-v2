@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             SchoolRoleSeeder::class,
             UserSeeder::class,
+            InvitationStatusSeeder::class,
         ]);
     }
 }

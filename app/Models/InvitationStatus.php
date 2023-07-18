@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
-class Grade extends Model
+class InvitationStatus extends Model
 {
     use HasFactory, SoftDeletes;
 
@@ -20,19 +20,10 @@ class Grade extends Model
 
         static::creating(function($model){
             $model->uuid = Str::uuid();
-            $model->created_by = auth()->user()->id;
-        });
-
-        static::saving(function($model){
-            $model->updated_by = auth()->user()->id;
-        });
-
-        static::deleting(function($model){
-            $model->deleted_by = auth()->user()->id;
         });
     }
 
-    public function majors(){
-        return $this->hasMany(Major::class,'grade_id','id');
+    public function userSchoolInvitations(){
+        return $this->hasMany(UserSchoolInvitation::class,'invitation_status_id','id');
     }
 }

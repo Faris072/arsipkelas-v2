@@ -21,6 +21,7 @@ class UserSchool extends Model
         static::creating(function($model){
             $model->uuid = Str::uuid();
             $model->created_by = auth()->user()->id;
+            $model->is_active = true;
         });
 
         static::saving(function($model){

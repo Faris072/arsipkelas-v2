@@ -7,9 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
-class Grade extends Model
+class UserSchoolInvitation extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     protected $guarded = ['id','uuid'];
 
@@ -32,7 +32,19 @@ class Grade extends Model
         });
     }
 
-    public function majors(){
-        return $this->hasMany(Major::class,'grade_id','id');
+    public function user(){
+        return $this->belongsTo(User::class,'user_id','id');
+    }
+
+    public function school(){
+        return $this->belongsTo(School::class,'school_id','id');
+    }
+
+    public function schoolRole(){
+        return $this->belongsTo(SchoolRole::class,'school_role_id','id');
+    }
+
+    public function invitationStatus(){
+        return $this->belongsTo(InvitationStatus::class,'invitation_status_id','id');
     }
 }
