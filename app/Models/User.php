@@ -10,14 +10,17 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Askedio\SoftCascade\Traits\SoftCascadeTrait;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes, SoftCascadeTrait;
 
     protected $guarded = ['id','uuid'];
 
     protected $hidden = ['id','password'];
+
+    protected $softCascade = ['photoProfile','userSchools'];
 
     protected static function boot(){
         parent::boot();

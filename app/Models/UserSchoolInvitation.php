@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 
 class UserSchoolInvitation extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $guarded = ['id','uuid'];
 

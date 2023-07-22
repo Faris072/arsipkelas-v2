@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Askedio\SoftCascade\Traits\SoftCascadeTrait;
 use Illuminate\Support\Str;
 
 class School extends Model
@@ -14,6 +15,8 @@ class School extends Model
     protected $guarded = ['id','uuid'];
 
     protected $hidden = ['id'];
+
+    protected $softCascade = ['schoolPhoto','semesters','classes','userSchools'];
 
     protected static function boot(){
         parent::boot();

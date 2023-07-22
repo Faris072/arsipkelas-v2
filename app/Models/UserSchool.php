@@ -5,15 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Askedio\SoftCascade\Traits\SoftCascadeTrait;
 use Illuminate\Support\Str;
 
 class UserSchool extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, SoftCascadeTrait;
 
     protected $guarded = ['id','uuid'];
 
     protected $hidden = ['id'];
+
+    protected $softCascade = ['userSchoolClasses'];
 
     protected static function boot(){
         parent::boot();
