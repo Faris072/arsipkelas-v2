@@ -14,6 +14,7 @@ use App\Helpers\Helper;
 use App\Models\SchoolPhoto;
 use App\Models\SchoolRole;
 use App\Models\UserSchool;
+use App\Models\Semester;
 use App\Models\UserSchoolInvitation;
 
 class SchoolController extends Controller
@@ -203,13 +204,14 @@ class SchoolController extends Controller
             $messages = [
                 'required' => ':attribute wajib dipilih.',
                 'uuid' => 'ID :attribute tidak valid.',
-                'string' => ':attribute harus berupa teks.'
+                'string' => ':attribute harus berupa teks.',
+                'exists' => ':attribute tidak ditemukan.'
             ];
 
             $validatedData = Validator::make($request->all(), [
-                'user_id' => 'required|uuid',
-                'school_id' => 'required|uuid',
-                'school_role_id' => 'required|uuid',
+                'user_id' => 'required|uuid|exists:users,uuid',
+                'school_id' => 'required|uuid|exists:schools,uuid',
+                'school_role_id' => 'required|uuid|exists:school_roles,uuid',
                 'description' => 'string|nullable',
             ], $messages, $attributes);
 
@@ -217,7 +219,6 @@ class SchoolController extends Controller
                 DB::rollback();
                 return $this->getResponse(null, $validatedData->getMessageBag(), 422);
             }
-
             $user = User::firstWhere('uuid', $request->user_id);
             $school = School::firstWhere('uuid', $request->school_id);
             $schoolRole = SchoolRole::firstWhere('uuid', $request->school_role_id);
@@ -283,6 +284,180 @@ class SchoolController extends Controller
 
             DB::commit();
             return $this->getResponse(null,'Data invitasi berhasil diterima.', 200);
+        }
+        catch(\Exception $e){
+            DB::rollback();
+            return $this->getResponse(null,$e->getMessage(),500);
+        }
+    }
+
+    public function rejectInvitation($id){
+        DB::beginTransaction();
+        try{
+            $userSchoolInvitation = UserSchoolInvitation::firstWhere('uuid',$id);
+            if(!$userSchoolInvitation){
+                DB::rollback();
+                return $this->getResponse(null,'Data invitasi tidak ditemukan',200);
+            }
+            if($userSchoolInvitation->invitation_status_id != 2){
+                DB::rollback();
+                return $this->getResponse(null,'Status invitasi tidak valid.',403);
+            }
+
+            $updateInvitation = $userSchoolInvitation->update(['invitation_status_id' => 3]);
+            if(!$updateInvitation){
+                DB::rollback();
+                return $this->getResponse(null,'Data invitasi gagal ditolak.',500);
+            }
+
+            DB::commit();
+            return $this->getResponse(null,'Data invitasi berhasil ditolak.', 200);
+        }
+        catch(\Exception $e){
+            DB::rollback();
+            return $this->getResponse(null,$e->getMessage(),500);
+        }
+    }
+
+    public function createSemester(Request $request){
+        DB::beginTransaction();
+        try{
+            $attributes = [
+                'school_id' => 'Sekolah',
+                'name' => 'Nama semester',
+                'year' => 'Tahun semester',
+            ];
+
+            $messages = [
+                'required' => ':attribute wajib di isi.',
+                'uuid' => 'ID :attribute tidak valid',
+                'numeric' => ':attribute harus berupa numeric.',
+                'string' => ':attribute harus berupa teks.'
+            ];
+
+            $validatedData = Validator::make($request->all(), [
+                'school_id' => 'required|uuid|exists:schools,uuid',
+                'name' => 'string|required',
+                'year' => 'required|numeric'
+            ],$messages,$attributes);
+
+            if($validatedData->fails()){
+                DB::rollback();
+                return $this->getResponse(null,$validatedData->getMessageBag(),422);
+            }
+
+            $check = Semester::with(['school'])
+                ->whereHas('school', function($q) use ($request){
+                    $q->where('uuid', $request->school_id);
+                })
+                ->where('slug',$request->name)
+                ->where('year',$request->year)->first();
+            if($check){
+                DB::rollback();
+                return $this->getResponse(null,'Data semester sudah ada.',400);
+            }
+
+            $school = School::firstWhere('uuid', $request->school_id);
+
+            $name = '';
+            switch($name){
+                case 'ganjil':
+                    $name = 'Ganjil';
+                    break;
+                case 'genap':
+                    $name = 'Genap';
+                    break;
+                default:
+                    $name = null;
+                    break;
+            }
+
+            $create = Semester::create([
+                'school_id' => $school->id,
+                'slug' => $request->name,
+                'name' => $name,
+                'year' => $request->year,
+            ]);
+            if(!$create){
+                DB::rollback();
+                return $this->getResponse(null,'Tambah semester gagal.',500);
+            }
+
+            DB::commit();
+            $this->getResponse(null,'Semester berhasil disimpan.',200);
+        }
+        catch(\Exception $e){
+            DB::rollback();
+            return $this->getResponse(null,$e->getMessage(),500);
+        }
+    }
+
+    public function updateSemester(Request $request, $id){
+        DB::beginTransaction();
+        try{
+            $attributes = [
+                'school_id' => 'Sekolah',
+                'name' => 'Nama semester',
+                'year' => 'Tahun semester',
+            ];
+
+            $messages = [
+                'required' => ':attribute wajib di isi.',
+                'uuid' => 'ID :attribute tidak valid',
+                'numeric' => ':attribute harus berupa numeric.',
+                'string' => ':attribute harus berupa teks.'
+            ];
+
+            $validatedData = Validator::make($request->all(), [
+                'school_id' => 'required|uuid|exists:schools,uuid',
+                'name' => 'string|required',
+                'year' => 'required|numeric'
+            ],$messages,$attributes);
+
+            if($validatedData->fails()){
+                DB::rollback();
+                return $this->getResponse(null,$validatedData->getMessageBag(),422);
+            }
+
+            $check = Semester::with(['school'])
+                ->whereHas('school', function($q) use ($request){
+                    $q->where('uuid', $request->school_id);
+                })
+                ->where('slug',$request->name)
+                ->where('year',$request->year)->first();
+            if($check){
+                DB::rollback();
+                return $this->getResponse(null,'Data semester sudah ada.',400);
+            }
+
+            $school = School::firstWhere('uuid', $request->school_id);
+
+            $name = '';
+            switch($name){
+                case 'ganjil':
+                    $name = 'Ganjil';
+                    break;
+                case 'genap':
+                    $name = 'Genap';
+                    break;
+                default:
+                    $name = null;
+                    break;
+            }
+
+            $create = Semester::create([
+                'school_id' => $school->id,
+                'slug' => $request->name,
+                'name' => $name,
+                'year' => $request->year,
+            ]);
+            if(!$create){
+                DB::rollback();
+                return $this->getResponse(null,'Tambah semester gagal.',500);
+            }
+
+            DB::commit();
+            $this->getResponse(null,'Semester berhasil disimpan.',200);
         }
         catch(\Exception $e){
             DB::rollback();

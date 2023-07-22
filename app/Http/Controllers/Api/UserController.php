@@ -253,4 +253,6 @@ class UserController extends Controller
             return $this->getResponse(null,$e->getMessage(),500);
         }
     }
+
+    // public function deleteUser
 }

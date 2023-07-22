@@ -23,14 +23,21 @@ Route::group(['middleware' => ['auth:sanctum']], function(){
         Route::post('logout','App\Http\Controllers\Api\UserController@logout');
         Route::put('reset-password/{id}','App\Http\Controllers\Api\UserController@resetPassword')->middleware('admin');
         Route::post('upload-photo-profile','App\Http\Controllers\Api\UserController@uploadFile');
+        Route::delete('/{id}','App\Http\Controllers\Api\UserController@logout')->middleware('admin');
     });
     Route::group(['prefix' => 'school'], function(){
-        Route::post('create','App\Http\Controllers\Api\SchoolController@create');
-        Route::group(['middleware', 'admin-school'], function(){
-            Route::put('update/{id}','App\Http\Controllers\Api\SchoolController@update')->middleware('admin-school');
+        Route::post('/','App\Http\Controllers\Api\SchoolController@create');
+        Route::group(['middleware' => 'school:admin'], function(){
+            Route::put('/{id}','App\Http\Controllers\Api\SchoolController@update');
             Route::post('upload-photo/{id}','App\Http\Controllers\Api\SchoolController@uploadPhoto');
             Route::post('invite','App\Http\Controllers\Api\SchoolController@invite');
-            Route::put('accept-invite/{id}','App\Http\Controllers\Api\SchoolController@acceptInvitation');
         });
+        Route::group(['middleware' => 'school:staff', 'prefix' => 'semester'], function(){
+            Route::post('/','App\Http\Controllers\Api\SchoolController@createSemester');
+            Route::post('/{id}','App\Http\Controllers\Api\SchoolController@updateSemester');
+        });
+        Route::put('accept-invite/{id}','App\Http\Controllers\Api\SchoolController@acceptInvitation');
+        Route::put('reject-invite/{id}','App\Http\Controllers\Api\SchoolController@rejectInvitation');
+
     });
 });

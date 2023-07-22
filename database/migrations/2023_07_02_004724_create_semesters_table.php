@@ -17,7 +17,8 @@ return new class extends Migration
             $table->id();
             $table->uuid('uuid')->unique();
             $table->foreignId('school_id')->constrained('schools')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->enum('name',['ganjil','genap']);
+            $table->enum('slug',['ganjil','genap']);
+            $table->enum('name', ['Ganjil','Genap']);
             $table->integer('year');
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();
