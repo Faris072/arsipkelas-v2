@@ -14,6 +14,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+//role list $users = ['admin','user',''];
+//role list $user_school = ['admin','staff','teacher','student'];
+
 Route::post('user/register','App\Http\Controllers\Api\UserController@register');
 Route::post('user/login','App\Http\Controllers\Api\UserController@login');
 Route::group(['middleware' => ['auth:sanctum']], function(){
@@ -21,9 +24,11 @@ Route::group(['middleware' => ['auth:sanctum']], function(){
         Route::get('me','App\Http\Controllers\Api\UserController@me');
         Route::put('change-password','App\Http\Controllers\Api\UserController@changePassword');
         Route::post('logout','App\Http\Controllers\Api\UserController@logout');
-        Route::put('reset-password/{id}','App\Http\Controllers\Api\UserController@resetPassword')->middleware('admin');
         Route::post('upload-photo-profile','App\Http\Controllers\Api\UserController@uploadFile');
-        Route::delete('/{id}','App\Http\Controllers\Api\UserController@logout')->middleware('admin');
+        // Route::delete('/{id}','App\Http\Controllers\Api\UserController@logout')->middleware('user:admin');
+        Route::group(['middleware' => 'user:admin'], function(){
+            Route::put('reset-password/{id}','App\Http\Controllers\Api\UserController@resetPassword');
+        });
     });
     Route::group(['prefix' => 'school'], function(){
         Route::post('/','App\Http\Controllers\Api\SchoolController@create');
@@ -41,3 +46,5 @@ Route::group(['middleware' => ['auth:sanctum']], function(){
 
     });
 });
+
+Route::get('unauthorized','App\Http\Controllers\Api\UserController@unauthorized')->name('unauthorized');

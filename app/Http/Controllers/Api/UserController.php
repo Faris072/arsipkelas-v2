@@ -14,6 +14,10 @@ use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
+    public function unauthorized(){
+        return $this->getResponse('Authentikasi gagal.','Silahkan login kembali.',401);
+    }
+
     public function register(Request $request){
         DB::beginTransaction();
         try{
