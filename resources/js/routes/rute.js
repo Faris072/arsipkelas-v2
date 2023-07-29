@@ -6,10 +6,12 @@ import Blog from "@/pages/Blog.vue";
 const routes = [
     {
         path: "/",
+        name: 'hero',
         component: Hero
     },
     {
         path: "/blog",
+        name: 'blog',
         component: Blog
     }
     // {
@@ -19,7 +21,7 @@ const routes = [
 ]
 
 const router = createRouter({
-    linkActiveClass: 'active',
+    // linkActiveClass: 'active',
     history: createWebHistory(),
     routes,
 })
