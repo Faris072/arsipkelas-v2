@@ -1,5 +1,5 @@
 import "./bootstrap";
-import { createApp } from "vue";
+import { createApp, ref, watch, computed, onMounted } from "vue";
 import router from "@/routes/rute.js";
 
 import App from "@/components/App.vue";
@@ -8,6 +8,10 @@ import Footer from "@/components/Footer.vue";
 
 let app = createApp(App);
 app.use(router);
+app.use(ref);
+app.use(watch);
+app.use(computed);
+app.use(onMounted);
 app.component("comp-header", Header);
 app.component("comp-footer", Footer);
 app.mount("#app");

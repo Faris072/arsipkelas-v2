@@ -663,6 +663,24 @@
         }
     }
 </script>
+<script setup>
+    import { onMounted, ref } from 'vue';
+
+    let faris;
+
+    onMounted(function(){
+        faris = new Faris();
+        faris.faris.value = 1;
+        console.log(faris.faris.value);
+    });
+
+    class Faris {
+        faris = ref(0);
+        constructor(){
+
+        }
+    }
+</script>
 
 <style scoped>
     .portfolio .portfolio-item {
