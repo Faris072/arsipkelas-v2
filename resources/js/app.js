@@ -8,10 +8,6 @@ import Footer from "@/components/Footer.vue";
 
 let app = createApp(App);
 app.use(router);
-app.use(ref);
-app.use(watch);
-app.use(computed);
-app.use(onMounted);
 app.component("comp-header", Header);
 app.component("comp-footer", Footer);
 app.mount("#app");
