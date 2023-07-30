@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\UserSchool;
 use App\Models\School;
 use App\Helpers\Helper;
+use App\Models\User;
 
 class SchoolMiddleware
 {
@@ -17,61 +18,19 @@ class SchoolMiddleware
      * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
-    public function handle(Request $request, Closure $next, ...$type)
+    public function handle(Request $request, Closure $next, ...$guards)
     {
-        $type = $type[0];
-        $schoolIdRoute = $request->route('id');
-        $schoolIdRequest = $request->school_id;
+        $userSchoolRole = UserSchool::with(['schoolRole'])
+            ->where('user_id',auth()->user()->id)
+            ->whereHas('school', function($q) use ($request){
+                $q->where('uuid', $request->route('schoolId') ?? $request->school_id);
+            })
+            ->first()->schoolRole;
 
-        if($type == 'admin'){
-            if(!$schoolIdRoute && !$schoolIdRequest){
-                return Helper::getResponse(null,'Sekolah tidak terdefinisikan.', 400);
-            }
-
-            $userSchool = UserSchool::where('user_id', auth()->user()->id)->where('school_id', School::firstWhere('uuid', $schoolIdRequest ?? $schoolIdRoute)->id)->first();
-            if($userSchool->school_role_id == 1 || auth()->user()->role_id < 3){}
-            else{
-                return Helper::getResponse('','Akses ditolak!',403);
-            }
-
+        if(in_array($userSchoolRole->slug, $guards)){
             return $next($request);
         }
-        else if($type == 'staff'){
-            if(!$schoolIdRoute && !$schoolIdRequest){
-                return Helper::getResponse(null,'Sekolah tidak terdefinisikan.', 400);
-            }
 
-            $userSchool = UserSchool::where('user_id', auth()->user()->id)->where('school_id', School::firstWhere('uuid', $schoolIdRequest ?? $schoolIdRoute)->id)->first();
-            if($userSchool->school_role_id < 3 || auth()->user()->role_id < 3){}
-            else{
-                return Helper::getResponse(null,'Akses Ditolak!',403);
-            }
-            return $next($request);
-        }
-        else if($type == 'teacher'){
-            if(!$schoolIdRoute && !$schoolIdRequest){
-                return Helper::getResponse(null,'Sekolah tidak terdefinisikan.', 400);
-            }
-
-            $userSchool = UserSchool::where('user_id', auth()->user()->id)->where('school_id', School::firstWhere('uuid', $schoolIdRequest ?? $schoolIdRoute)->id)->first();
-            if($userSchool->school_role_id == 1 || $userSchool->school_role_id == 3 || auth()->user()->id < 3){}
-            else{
-                return Helper::getResponse(null,'Akses Ditolak!',403);
-            }
-            return $next($request);
-        }
-        else{
-            if(!$schoolIdRoute && !$schoolIdRequest){
-                return Helper::getResponse(null,'Sekolah tidak terdefinisikan.', 400);
-            }
-
-            $userSchool = UserSchool::where('user_id', auth()->user()->id)->where('school_id', School::firstWhere('uuid', $schoolIdRequest ?? $schoolIdRoute)->id)->first();
-            if($userSchool->school_role_id == 4 || $userSchool->school_role_id == 1  || auth()->user()->role_id > 2){}
-            else{
-                return Helper::getResponse(null, 'Akses Ditolak!', 403);
-            }
-
-            return $next($request);
-        }
+        return Helper::getResponse('Akses ditolak.','Anda tidak bisa mengakses URL ini karena role anda tidak sesuai.',403);
     }
 }

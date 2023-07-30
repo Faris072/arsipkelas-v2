@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-//role list $users = ['admin','user',''];
+//role list $users = ['developer','admin','user'];
 //role list $user_school = ['admin','staff','teacher','student'];
 
 Route::post('user/register','App\Http\Controllers\Api\UserController@register');
@@ -33,17 +33,19 @@ Route::group(['middleware' => ['auth:sanctum']], function(){
     Route::group(['prefix' => 'school'], function(){
         Route::post('/','App\Http\Controllers\Api\SchoolController@create');
         Route::group(['middleware' => 'school:admin'], function(){
-            Route::put('/{id}','App\Http\Controllers\Api\SchoolController@update');
-            Route::post('upload-photo/{id}','App\Http\Controllers\Api\SchoolController@uploadPhoto');
+            Route::put('/{schoolId}','App\Http\Controllers\Api\SchoolController@update');
+            Route::post('upload-photo/{schoolId}','App\Http\Controllers\Api\SchoolController@uploadPhoto');
             Route::post('invite','App\Http\Controllers\Api\SchoolController@invite');
         });
-        Route::group(['middleware' => 'school:staff', 'prefix' => 'semester'], function(){
-            Route::post('/','App\Http\Controllers\Api\SchoolController@createSemester');
-            Route::post('/{id}','App\Http\Controllers\Api\SchoolController@updateSemester');
-        });
-        Route::put('accept-invite/{id}','App\Http\Controllers\Api\SchoolController@acceptInvitation');
-        Route::put('reject-invite/{id}','App\Http\Controllers\Api\SchoolController@rejectInvitation');
+        Route::put('accept-invite/{schoolId}','App\Http\Controllers\Api\SchoolController@acceptInvitation');
+        Route::put('reject-invite/{schoolId}','App\Http\Controllers\Api\SchoolController@rejectInvitation');
 
+    });
+
+    Route::group(['middleware' => 'school:admin,staff', 'prefix' => 'semester'], function(){
+        Route::post('/','App\Http\Controllers\Api\SemesterController@createSemester');
+        Route::put('/{semesterId}','App\Http\Controllers\Api\SemesterController@updateSemester');
+        Route::delete('/{semesterId}','App\Http\Controllers\Api\SemesterController@deleteSemester');
     });
 });
 
