@@ -181,11 +181,11 @@ return [
         Illuminate\Translation\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
-        Askedio\SoftCascade\Providers\LumenServiceProvider::class,
 
         /*
          * Package Service Providers...
          */
+        Askedio\SoftCascade\Providers\LumenServiceProvider::class,
 
         /*
          * Application Service Providers...
